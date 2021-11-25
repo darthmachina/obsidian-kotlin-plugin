@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-kotlin-plugin",
+  "name": "Kotlin Sample Plugin",
+  "version": "0.1.0",
+  "minAppVersion": "0.12.17",
+  "description": "Base plugin for Obsidian using Kotlin",
+  "author": "darthmachina",
+  "authorUrl": "https://obsidian.md",
+  "isDesktopOnly": false
+}
