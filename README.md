@@ -10,3 +10,5 @@ The Kotlin bindings for Obsidian were created by using [Dukat](https://github.co
 CodeMirror had two errors, only one of which was something not immediately fixable. Once the plugin itself is running in Obsidian I plan on revisiting the CodeMirror bindings and pulling those in as well.
 
 I was hoping that Dukat could be fully integrated into the build but there were a LOT of errors in the DOM bindings, so at least for now the bindings are a manual process.
+
+Thanks to the answer on [Stack Overflow](https://stackoverflow.com/questions/68293035/how-to-convert-javascript-exported-class-to-kotlin-js) for getting me through the last issues I was having.
