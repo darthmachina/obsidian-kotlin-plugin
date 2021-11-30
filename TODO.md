@@ -4,7 +4,7 @@
 - [ ] Get tests working
   - `browserTest` is excluded which seems to exclude `test` as well 
 - [ ] Make repository a Template
-- [ ] Can `index.html` be removed?
+- [x] Can `index.html` be removed?
 - [ ] Replace basic settings check with version check
 
 ## Obsidian API Bindings

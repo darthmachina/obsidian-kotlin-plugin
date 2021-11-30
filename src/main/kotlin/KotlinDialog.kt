@@ -1,8 +1,3 @@
-package dialogs
-
-import App
-import Modal
-
 class KotlinDialog(override var app: App) : Modal(app) {
     override fun onOpen() {
         contentEl.innerText = "Woah!"
