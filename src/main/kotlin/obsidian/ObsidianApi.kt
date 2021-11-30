@@ -17,7 +17,32 @@ open external class Component {
     open fun onunload()
 }
 
-open external class Plugin(app: App, manifest: PluginManifest) : Component
+open external class Plugin(app: App, manifest: PluginManifest) : Component {
+    open var app: App
+    open var manifest: PluginManifest
+    open fun addRibbonIcon(icon: String, title: String, callback: (evt: MouseEvent) -> Any): HTMLElement
+    open fun addStatusBarItem(): HTMLElement
+    open fun addCommand(command: Command): Command
+    open fun addSettingTab(settingTab: PluginSettingTab)
+//    open fun registerView(type: String, viewCreator: ViewCreator)
+    open fun registerExtensions(extensions: Array<String>, viewType: String)
+    open fun registerMarkdownPostProcessor(postProcessor: MarkdownPostProcessor): MarkdownPostProcessor
+    open fun registerMarkdownCodeBlockProcessor(language: String, handler: (source: String, el: HTMLElement, ctx: MarkdownPostProcessorContext) -> Any): MarkdownPostProcessor
+//    open fun registerCodeMirror(callback: (cm: CodeMirror.Editor) -> Any)
+//    open fun registerObsidianProtocolHandler(action: String, handler: ObsidianProtocolHandler)
+    open fun registerEditorSuggest(editorSuggest: EditorSuggest<Any>)
+    open fun loadData(): Promise<Any>
+    open fun saveData(data: Any): Promise<Unit>
+}
+
+open external class PluginSettingTab(app: App, plugin: Plugin) : SettingTab
+
+open external class SettingTab {
+    open var app: App
+    open var containerEl: HTMLElement
+    open fun display(): Any
+    open fun hide(): Any
+}
 
 open external class App {
     open var workspace: Workspace
@@ -121,6 +146,32 @@ open external class Vault : Events {
     companion object {
         fun recurseChildren(root: TFolder, cb: (file: TAbstractFile) -> Any)
     }
+}
+
+external interface Command {
+    var id: String
+    var name: String
+    var icon: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var mobileOnly: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
+    var callback: (() -> Any)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var checkCallback: ((checking: Boolean) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var editorCallback: ((editor: Editor, view: MarkdownView) -> Any)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var editorCheckCallback: ((checking: Boolean, editor: Editor, view: MarkdownView) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var hotkeys: Array<Hotkey>?
+        get() = definedExternally
+        set(value) = definedExternally
 }
 
 open external class MetadataCache : Events {
@@ -310,6 +361,8 @@ open external class WorkspaceLeaf : WorkspaceItem {
     open fun on(name: String /* "group-change" */, callback: (group: String) -> Any): EventRef
 }
 
+//typealias ViewCreator = (leaf: WorkspaceLeaf) -> View
+
 open external class View(leaf: WorkspaceLeaf) : Component {
     open var app: App
     open var icon: String
@@ -327,6 +380,28 @@ open external class View(leaf: WorkspaceLeaf) : Component {
     open fun onResize()
     open fun getDisplayText(): String
     open fun onHeaderMenu(menu: Menu)
+}
+
+external interface MarkdownPostProcessor {
+    @nativeInvoke
+    operator fun invoke(el: HTMLElement, ctx: MarkdownPostProcessorContext): dynamic /* Promise<Any> | Unit */
+    var sortOrder: Number?
+        get() = definedExternally
+        set(value) = definedExternally
+}
+
+external interface MarkdownPostProcessorContext {
+    var docId: String
+    var sourcePath: String
+    var frontmatter: Any?
+    fun addChild(child: MarkdownRenderChild)
+    fun getSectionInfo(el: HTMLElement): MarkdownSectionInformation?
+}
+
+external interface MarkdownSectionInformation {
+    var text: String
+    var lineStart: Number
+    var lineEnd: Number
 }
 
 open external class MarkdownView(leaf: WorkspaceLeaf) : TextFileView {
@@ -562,6 +637,11 @@ open external class Scope {
     open fun unregister(handler: KeymapEventHandler)
 }
 
+external interface Hotkey {
+    var modifiers: Array<String /* "Mod" | "Ctrl" | "Meta" | "Shift" | "Alt" */>
+    var key: String
+}
+
 external interface KeymapEventHandler : KeymapInfo {
     var scope: Scope
 }
@@ -650,6 +730,8 @@ open external class Events {
     open fun trigger(name: String, vararg data: Any)
     open fun tryTrigger(evt: EventRef, args: Array<Any>)
 }
+
+//typealias ObsidianProtocolHandler = (params: ObsidianProtocolData) -> Any
 
 external interface EventRef
 
