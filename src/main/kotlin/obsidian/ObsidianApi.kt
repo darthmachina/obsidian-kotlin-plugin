@@ -561,6 +561,20 @@ open external class Editor {
     open fun offsetToPos(offset: Number): EditorPosition
 }
 
+open external class Modal(app: App) : CloseableComponent {
+    open var app: App
+    open var scope: Scope
+    open var containerEl: HTMLElement
+    open var modalEl: HTMLElement
+    open var titleEl: HTMLElement
+    open var contentEl: HTMLElement
+    open var shouldRestoreSelection: Boolean
+    open fun open()
+    override fun close()
+    open fun onOpen()
+    open fun onClose()
+}
+
 external interface `T$1` {
     var top: Number
     var left: Number
