@@ -6,9 +6,7 @@ import obsidian.ClipboardEvent
 import kotlin.js.Promise
 import obsidian.Record
 import org.khronos.webgl.ArrayBuffer
-import org.w3c.dom.DocumentFragment
-import org.w3c.dom.DragEvent
-import org.w3c.dom.HTMLElement
+import org.w3c.dom.*
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 
@@ -172,6 +170,33 @@ external interface Command {
     var hotkeys: Array<Hotkey>?
         get() = definedExternally
         set(value) = definedExternally
+}
+
+open external class Setting(containerEl: HTMLElement) {
+    open var settingEl: HTMLElement
+    open var infoEl: HTMLElement
+    open var nameEl: HTMLElement
+    open var descEl: HTMLElement
+    open var controlEl: HTMLElement
+    open var components: Array<BaseComponent>
+    open fun setName(name: String): Setting /* this */
+    open fun setName(name: DocumentFragment): Setting /* this */
+    open fun setDesc(desc: String): Setting /* this */
+    open fun setDesc(desc: DocumentFragment): Setting /* this */
+    open fun setClass(cls: String): Setting /* this */
+    open fun setTooltip(tooltip: String): Setting /* this */
+    open fun setHeading(): Setting /* this */
+    open fun setDisabled(disabled: Boolean): Setting /* this */
+    open fun addButton(cb: (component: ButtonComponent) -> Any): Setting /* this */
+    open fun addExtraButton(cb: (component: ExtraButtonComponent) -> Any): Setting /* this */
+    open fun addToggle(cb: (component: ToggleComponent) -> Any): Setting /* this */
+    open fun addText(cb: (component: TextComponent) -> Any): Setting /* this */
+    open fun addSearch(cb: (component: SearchComponent) -> Any): Setting /* this */
+    open fun addTextArea(cb: (component: TextAreaComponent) -> Any): Setting /* this */
+    open fun addMomentFormat(cb: (component: MomentFormatComponent) -> Any): Setting /* this */
+    open fun addDropdown(cb: (component: DropdownComponent) -> Any): Setting /* this */
+    open fun addSlider(cb: (component: SliderComponent) -> Any): Setting /* this */
+    open fun then(cb: (setting: Setting /* this */) -> Any): Setting /* this */
 }
 
 open external class MetadataCache : Events {
@@ -383,6 +408,7 @@ open external class View(leaf: WorkspaceLeaf) : Component {
 }
 
 external interface MarkdownPostProcessor {
+    @Suppress("DEPRECATION")
     @nativeInvoke
     operator fun invoke(el: HTMLElement, ctx: MarkdownPostProcessorContext): dynamic /* Promise<Any> | Unit */
     var sortOrder: Number?
@@ -683,6 +709,100 @@ external interface ReferenceCache : CacheItem {
     var displayText: String?
         get() = definedExternally
         set(value) = definedExternally
+}
+
+open external class AbstractTextComponent<T>(inputEl: T) : ValueComponent<String> {
+    open var inputEl: T
+    override fun setDisabled(disabled: Boolean): AbstractTextComponent<T> /* this */
+    override fun getValue(): String
+    override fun setValue(value: String): AbstractTextComponent<T> /* this */
+    open fun setPlaceholder(placeholder: String): AbstractTextComponent<T> /* this */
+    open fun onChanged()
+    open fun onChange(callback: (value: String) -> Any): AbstractTextComponent<T> /* this */
+}
+
+open external class BaseComponent {
+    open var disabled: Boolean
+    open fun then(cb: (component: BaseComponent /* this */) -> Any): BaseComponent /* this */
+    open fun setDisabled(disabled: Boolean): BaseComponent /* this */
+}
+
+open external class ButtonComponent(containerEl: HTMLElement) : BaseComponent {
+    open var buttonEl: HTMLButtonElement
+    override fun setDisabled(disabled: Boolean): ButtonComponent /* this */
+    open fun setCta(): ButtonComponent /* this */
+    open fun removeCta(): ButtonComponent /* this */
+    open fun setWarning(): ButtonComponent /* this */
+    open fun setTooltip(tooltip: String): ButtonComponent /* this */
+    open fun setButtonText(name: String): ButtonComponent /* this */
+    open fun setIcon(icon: String): ButtonComponent /* this */
+    open fun setClass(cls: String): ButtonComponent /* this */
+    open fun onClick(callback: (evt: MouseEvent) -> Any): ButtonComponent /* this */
+}
+
+open external class DropdownComponent(containerEl: HTMLElement) : ValueComponent<String> {
+    open var selectEl: HTMLSelectElement
+    override fun setDisabled(disabled: Boolean): DropdownComponent /* this */
+    open fun addOption(value: String, display: String): DropdownComponent /* this */
+    open fun addOptions(options: Record<String, String>): DropdownComponent /* this */
+    override fun getValue(): String
+    override fun setValue(value: String): DropdownComponent /* this */
+    open fun onChange(callback: (value: String) -> Any): DropdownComponent /* this */
+}
+
+open external class ExtraButtonComponent(containerEl: HTMLElement) : BaseComponent {
+    open var extraSettingsEl: HTMLElement
+    override fun setDisabled(disabled: Boolean): ExtraButtonComponent /* this */
+    open fun setTooltip(tooltip: String): ExtraButtonComponent /* this */
+    open fun setIcon(icon: String): ExtraButtonComponent /* this */
+    open fun onClick(callback: () -> Any): ExtraButtonComponent /* this */
+}
+
+open external class MomentFormatComponent(containerEl: HTMLElement) : TextComponent {
+    open var sampleEl: HTMLElement
+    open fun setDefaultFormat(defaultFormat: String): MomentFormatComponent /* this */
+    open fun setSampleEl(sampleEl: HTMLElement): MomentFormatComponent /* this */
+    override fun setValue(value: String): MomentFormatComponent /* this */
+    override fun onChanged()
+    open fun updateSample()
+}
+
+open external class SearchComponent(containerEl: HTMLElement) : AbstractTextComponent<HTMLInputElement> {
+    open var clearButtonEl: HTMLElement
+    override fun onChanged()
+}
+
+open external class SliderComponent(containerEl: HTMLElement) : ValueComponent<Number> {
+    open var sliderEl: HTMLInputElement
+    override fun setDisabled(disabled: Boolean): SliderComponent /* this */
+    open fun setLimits(min: Number, max: Number, step: Number): SliderComponent /* this */
+    open fun setLimits(min: Number, max: Number, step: String /* "any" */): SliderComponent /* this */
+    override fun getValue(): Number
+    override fun setValue(value: Number): SliderComponent /* this */
+    open fun getValuePretty(): String
+    open fun setDynamicTooltip(): SliderComponent /* this */
+    open fun showTooltip()
+    open fun onChange(callback: (value: Number) -> Any): SliderComponent /* this */
+}
+
+open external class TextAreaComponent(containerEl: HTMLElement) : AbstractTextComponent<HTMLTextAreaElement>
+
+open external class TextComponent(containerEl: HTMLElement) : AbstractTextComponent<HTMLInputElement>
+
+open external class ToggleComponent(containerEl: HTMLElement) : ValueComponent<Boolean> {
+    open var toggleEl: HTMLElement
+    override fun setDisabled(disabled: Boolean): ToggleComponent /* this */
+    override fun getValue(): Boolean
+    override fun setValue(value: Boolean): ToggleComponent /* this */
+    open fun setTooltip(tooltip: String): ToggleComponent /* this */
+    open fun onClick()
+    open fun onChange(callback: (value: Boolean) -> Any): ToggleComponent /* this */
+}
+
+open external class ValueComponent<T> : BaseComponent {
+    open fun registerOptionListener(listeners: Record<String, (value: T) -> T>, key: String): ValueComponent<T> /* this */
+    open fun getValue(): T
+    open fun setValue(value: T): ValueComponent<T> /* this */
 }
 
 external interface CloseableComponent {
