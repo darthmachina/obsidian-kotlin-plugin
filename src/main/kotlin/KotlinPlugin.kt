@@ -1,5 +1,4 @@
-import builders.CommandBuilder
-import dialogs.KotlinDialog
+import obsidian.builders.CommandBuilder
 
 @OptIn(ExperimentalJsExport::class)
 @JsExport

@@ -2,7 +2,7 @@ plugins {
     kotlin("js") version "1.6.0"
 }
 
-group = "darthmachina"
+group = "io.github.darthmachina"
 version = "0.1.0-SNAPSHOT"
 
 repositories {

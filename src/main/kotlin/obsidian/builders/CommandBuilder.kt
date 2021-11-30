@@ -1,4 +1,4 @@
-package builders
+package obsidian.builders
 
 import Command
 import Editor
