@@ -7,9 +7,11 @@ Right now the plugin only outputs "KotlinPlugin onload()" and "KotlinPlugin onun
 To use this for developing a plugin:
 1. Fork the repo
 2. Rename `KotlinPlugin` to something more descriptive
-3. Rename `KotlinPluginTest` to match the main plugin name
-4. Edit `src/main/resources/manifest.json` to match your plugin information
-5. Edit `settings.gradle.kts` to match the rootProject name
+3. Rename `KotlinPluginTest` to match the plugin name
+4. Rename `KotlinPluginSettings` to match the plugin name
+5. Rename `KotlinPluginSettingsTab` to match the plugin name
+6. Edit `src/main/resources/manifest.json` to match your plugin information
+7. Edit `settings.gradle.kts` to match the rootProject name
 
 **NOTE:** I believe the `index.html` is required for KotlinJS Gradle tasks. I have a TODO item to see about removing that.
 

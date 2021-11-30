@@ -6,9 +6,7 @@ import obsidian.ClipboardEvent
 import kotlin.js.Promise
 import obsidian.Record
 import org.khronos.webgl.ArrayBuffer
-import org.w3c.dom.DocumentFragment
-import org.w3c.dom.DragEvent
-import org.w3c.dom.HTMLElement
+import org.w3c.dom.*
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 
@@ -17,7 +15,32 @@ open external class Component {
     open fun onunload()
 }
 
-open external class Plugin(app: App, manifest: PluginManifest) : Component
+open external class Plugin(app: App, manifest: PluginManifest) : Component {
+    open var app: App
+    open var manifest: PluginManifest
+    open fun addRibbonIcon(icon: String, title: String, callback: (evt: MouseEvent) -> Any): HTMLElement
+    open fun addStatusBarItem(): HTMLElement
+    open fun addCommand(command: Command): Command
+    open fun addSettingTab(settingTab: PluginSettingTab)
+//    open fun registerView(type: String, viewCreator: ViewCreator)
+    open fun registerExtensions(extensions: Array<String>, viewType: String)
+    open fun registerMarkdownPostProcessor(postProcessor: MarkdownPostProcessor): MarkdownPostProcessor
+    open fun registerMarkdownCodeBlockProcessor(language: String, handler: (source: String, el: HTMLElement, ctx: MarkdownPostProcessorContext) -> Any): MarkdownPostProcessor
+//    open fun registerCodeMirror(callback: (cm: CodeMirror.Editor) -> Any)
+//    open fun registerObsidianProtocolHandler(action: String, handler: ObsidianProtocolHandler)
+    open fun registerEditorSuggest(editorSuggest: EditorSuggest<Any>)
+    open fun loadData(): Promise<Any>
+    open fun saveData(data: Any): Promise<Unit>
+}
+
+open external class PluginSettingTab(app: App, plugin: Plugin) : SettingTab
+
+open external class SettingTab {
+    open var app: App
+    open var containerEl: HTMLElement
+    open fun display(): Any
+    open fun hide(): Any
+}
 
 open external class App {
     open var workspace: Workspace
@@ -121,6 +144,59 @@ open external class Vault : Events {
     companion object {
         fun recurseChildren(root: TFolder, cb: (file: TAbstractFile) -> Any)
     }
+}
+
+external interface Command {
+    var id: String
+    var name: String
+    var icon: String?
+        get() = definedExternally
+        set(value) = definedExternally
+    var mobileOnly: Boolean?
+        get() = definedExternally
+        set(value) = definedExternally
+    var callback: (() -> Any)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var checkCallback: ((checking: Boolean) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var editorCallback: ((editor: Editor, view: MarkdownView) -> Any)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var editorCheckCallback: ((checking: Boolean, editor: Editor, view: MarkdownView) -> dynamic)?
+        get() = definedExternally
+        set(value) = definedExternally
+    var hotkeys: Array<Hotkey>?
+        get() = definedExternally
+        set(value) = definedExternally
+}
+
+open external class Setting(containerEl: HTMLElement) {
+    open var settingEl: HTMLElement
+    open var infoEl: HTMLElement
+    open var nameEl: HTMLElement
+    open var descEl: HTMLElement
+    open var controlEl: HTMLElement
+    open var components: Array<BaseComponent>
+    open fun setName(name: String): Setting /* this */
+    open fun setName(name: DocumentFragment): Setting /* this */
+    open fun setDesc(desc: String): Setting /* this */
+    open fun setDesc(desc: DocumentFragment): Setting /* this */
+    open fun setClass(cls: String): Setting /* this */
+    open fun setTooltip(tooltip: String): Setting /* this */
+    open fun setHeading(): Setting /* this */
+    open fun setDisabled(disabled: Boolean): Setting /* this */
+    open fun addButton(cb: (component: ButtonComponent) -> Any): Setting /* this */
+    open fun addExtraButton(cb: (component: ExtraButtonComponent) -> Any): Setting /* this */
+    open fun addToggle(cb: (component: ToggleComponent) -> Any): Setting /* this */
+    open fun addText(cb: (component: TextComponent) -> Any): Setting /* this */
+    open fun addSearch(cb: (component: SearchComponent) -> Any): Setting /* this */
+    open fun addTextArea(cb: (component: TextAreaComponent) -> Any): Setting /* this */
+    open fun addMomentFormat(cb: (component: MomentFormatComponent) -> Any): Setting /* this */
+    open fun addDropdown(cb: (component: DropdownComponent) -> Any): Setting /* this */
+    open fun addSlider(cb: (component: SliderComponent) -> Any): Setting /* this */
+    open fun then(cb: (setting: Setting /* this */) -> Any): Setting /* this */
 }
 
 open external class MetadataCache : Events {
@@ -310,6 +386,8 @@ open external class WorkspaceLeaf : WorkspaceItem {
     open fun on(name: String /* "group-change" */, callback: (group: String) -> Any): EventRef
 }
 
+//typealias ViewCreator = (leaf: WorkspaceLeaf) -> View
+
 open external class View(leaf: WorkspaceLeaf) : Component {
     open var app: App
     open var icon: String
@@ -327,6 +405,29 @@ open external class View(leaf: WorkspaceLeaf) : Component {
     open fun onResize()
     open fun getDisplayText(): String
     open fun onHeaderMenu(menu: Menu)
+}
+
+external interface MarkdownPostProcessor {
+    @Suppress("DEPRECATION")
+    @nativeInvoke
+    operator fun invoke(el: HTMLElement, ctx: MarkdownPostProcessorContext): dynamic /* Promise<Any> | Unit */
+    var sortOrder: Number?
+        get() = definedExternally
+        set(value) = definedExternally
+}
+
+external interface MarkdownPostProcessorContext {
+    var docId: String
+    var sourcePath: String
+    var frontmatter: Any?
+    fun addChild(child: MarkdownRenderChild)
+    fun getSectionInfo(el: HTMLElement): MarkdownSectionInformation?
+}
+
+external interface MarkdownSectionInformation {
+    var text: String
+    var lineStart: Number
+    var lineEnd: Number
 }
 
 open external class MarkdownView(leaf: WorkspaceLeaf) : TextFileView {
@@ -460,6 +561,20 @@ open external class Editor {
     open fun offsetToPos(offset: Number): EditorPosition
 }
 
+open external class Modal(app: App) : CloseableComponent {
+    open var app: App
+    open var scope: Scope
+    open var containerEl: HTMLElement
+    open var modalEl: HTMLElement
+    open var titleEl: HTMLElement
+    open var contentEl: HTMLElement
+    open var shouldRestoreSelection: Boolean
+    open fun open()
+    override fun close()
+    open fun onOpen()
+    open fun onClose()
+}
+
 external interface `T$1` {
     var top: Number
     var left: Number
@@ -562,6 +677,11 @@ open external class Scope {
     open fun unregister(handler: KeymapEventHandler)
 }
 
+external interface Hotkey {
+    var modifiers: Array<String /* "Mod" | "Ctrl" | "Meta" | "Shift" | "Alt" */>
+    var key: String
+}
+
 external interface KeymapEventHandler : KeymapInfo {
     var scope: Scope
 }
@@ -603,6 +723,100 @@ external interface ReferenceCache : CacheItem {
     var displayText: String?
         get() = definedExternally
         set(value) = definedExternally
+}
+
+open external class AbstractTextComponent<T>(inputEl: T) : ValueComponent<String> {
+    open var inputEl: T
+    override fun setDisabled(disabled: Boolean): AbstractTextComponent<T> /* this */
+    override fun getValue(): String
+    override fun setValue(value: String): AbstractTextComponent<T> /* this */
+    open fun setPlaceholder(placeholder: String): AbstractTextComponent<T> /* this */
+    open fun onChanged()
+    open fun onChange(callback: (value: String) -> Any): AbstractTextComponent<T> /* this */
+}
+
+open external class BaseComponent {
+    open var disabled: Boolean
+    open fun then(cb: (component: BaseComponent /* this */) -> Any): BaseComponent /* this */
+    open fun setDisabled(disabled: Boolean): BaseComponent /* this */
+}
+
+open external class ButtonComponent(containerEl: HTMLElement) : BaseComponent {
+    open var buttonEl: HTMLButtonElement
+    override fun setDisabled(disabled: Boolean): ButtonComponent /* this */
+    open fun setCta(): ButtonComponent /* this */
+    open fun removeCta(): ButtonComponent /* this */
+    open fun setWarning(): ButtonComponent /* this */
+    open fun setTooltip(tooltip: String): ButtonComponent /* this */
+    open fun setButtonText(name: String): ButtonComponent /* this */
+    open fun setIcon(icon: String): ButtonComponent /* this */
+    open fun setClass(cls: String): ButtonComponent /* this */
+    open fun onClick(callback: (evt: MouseEvent) -> Any): ButtonComponent /* this */
+}
+
+open external class DropdownComponent(containerEl: HTMLElement) : ValueComponent<String> {
+    open var selectEl: HTMLSelectElement
+    override fun setDisabled(disabled: Boolean): DropdownComponent /* this */
+    open fun addOption(value: String, display: String): DropdownComponent /* this */
+    open fun addOptions(options: Record<String, String>): DropdownComponent /* this */
+    override fun getValue(): String
+    override fun setValue(value: String): DropdownComponent /* this */
+    open fun onChange(callback: (value: String) -> Any): DropdownComponent /* this */
+}
+
+open external class ExtraButtonComponent(containerEl: HTMLElement) : BaseComponent {
+    open var extraSettingsEl: HTMLElement
+    override fun setDisabled(disabled: Boolean): ExtraButtonComponent /* this */
+    open fun setTooltip(tooltip: String): ExtraButtonComponent /* this */
+    open fun setIcon(icon: String): ExtraButtonComponent /* this */
+    open fun onClick(callback: () -> Any): ExtraButtonComponent /* this */
+}
+
+open external class MomentFormatComponent(containerEl: HTMLElement) : TextComponent {
+    open var sampleEl: HTMLElement
+    open fun setDefaultFormat(defaultFormat: String): MomentFormatComponent /* this */
+    open fun setSampleEl(sampleEl: HTMLElement): MomentFormatComponent /* this */
+    override fun setValue(value: String): MomentFormatComponent /* this */
+    override fun onChanged()
+    open fun updateSample()
+}
+
+open external class SearchComponent(containerEl: HTMLElement) : AbstractTextComponent<HTMLInputElement> {
+    open var clearButtonEl: HTMLElement
+    override fun onChanged()
+}
+
+open external class SliderComponent(containerEl: HTMLElement) : ValueComponent<Number> {
+    open var sliderEl: HTMLInputElement
+    override fun setDisabled(disabled: Boolean): SliderComponent /* this */
+    open fun setLimits(min: Number, max: Number, step: Number): SliderComponent /* this */
+    open fun setLimits(min: Number, max: Number, step: String /* "any" */): SliderComponent /* this */
+    override fun getValue(): Number
+    override fun setValue(value: Number): SliderComponent /* this */
+    open fun getValuePretty(): String
+    open fun setDynamicTooltip(): SliderComponent /* this */
+    open fun showTooltip()
+    open fun onChange(callback: (value: Number) -> Any): SliderComponent /* this */
+}
+
+open external class TextAreaComponent(containerEl: HTMLElement) : AbstractTextComponent<HTMLTextAreaElement>
+
+open external class TextComponent(containerEl: HTMLElement) : AbstractTextComponent<HTMLInputElement>
+
+open external class ToggleComponent(containerEl: HTMLElement) : ValueComponent<Boolean> {
+    open var toggleEl: HTMLElement
+    override fun setDisabled(disabled: Boolean): ToggleComponent /* this */
+    override fun getValue(): Boolean
+    override fun setValue(value: Boolean): ToggleComponent /* this */
+    open fun setTooltip(tooltip: String): ToggleComponent /* this */
+    open fun onClick()
+    open fun onChange(callback: (value: Boolean) -> Any): ToggleComponent /* this */
+}
+
+open external class ValueComponent<T> : BaseComponent {
+    open fun registerOptionListener(listeners: Record<String, (value: T) -> T>, key: String): ValueComponent<T> /* this */
+    open fun getValue(): T
+    open fun setValue(value: T): ValueComponent<T> /* this */
 }
 
 external interface CloseableComponent {
@@ -650,6 +864,8 @@ open external class Events {
     open fun trigger(name: String, vararg data: Any)
     open fun tryTrigger(evt: EventRef, args: Array<Any>)
 }
+
+//typealias ObsidianProtocolHandler = (params: ObsidianProtocolData) -> Any
 
 external interface EventRef
 
