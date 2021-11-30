@@ -12,8 +12,8 @@ class KotlinPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
 
         // This adds a simple command that can be triggered anywhere
         addCommand(CommandBuilder(
-            "open-sample-modal-simple",
-            "Open sample modal (simple)")
+            "open-kotlin-modal-simple",
+            "Open Kotlin modal (simple)")
             .callback {
                 KotlinDialog(app).open()
             }
@@ -28,6 +28,9 @@ class KotlinPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
                 editor.replaceSelection("Sample Editor Command")
             }
             .build())
+
+        // This adds a complex command that can check whether the current state of the app allows execution of the command
+        // TODO Figure out how to use getActiveViewOfType
 
         // Add Settings tab
         addSettingTab(KotlinPluginSettingsTab(app, this))
