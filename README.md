@@ -4,8 +4,6 @@ Base Obsidian plugin in Kotlin
 ## Usage
 Right now the plugin only outputs "KotlinPlugin onload()" and "KotlinPlugin onunload()" to the console if it is loaded and unloaded successfully, respectively. 
 
-**NOTE:** I believe the `index.html` is required for KotlinJS Gradle tasks. I have a TODO item to see about removing that.
-
 **NOTE:** I plan on making this repo a Template, but leaving that off for now as the bindings will be improved in the short-term. I will try to make breaking changes minimal so people can pull changes into their forked repository without too much trouble.
 
 To use this for developing a plugin:
