@@ -40,7 +40,7 @@ open external class Plugin(app: App, manifest: PluginManifest) : Component {
 //    open fun registerCodeMirror(callback: (cm: CodeMirror.Editor) -> Any)
 //    open fun registerObsidianProtocolHandler(action: String, handler: ObsidianProtocolHandler)
     open fun registerEditorSuggest(editorSuggest: EditorSuggest<Any>)
-    open fun loadData(): Promise<Any>
+    open fun loadData(): Promise<Any?>
     open fun saveData(data: Any): Promise<Unit>
 }
 
