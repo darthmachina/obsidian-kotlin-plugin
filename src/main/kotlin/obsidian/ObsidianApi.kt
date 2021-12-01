@@ -11,8 +11,19 @@ import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 
 open external class Component {
+    open fun load()
     open fun onload()
+    open fun unload()
     open fun onunload()
+    open fun <T : Component> addChild(component: T): T
+    open fun <T : Component> removeChild(component: T): T
+    open fun register(cb: () -> Any)
+    open fun registerEvent(eventRef: EventRef)
+    open fun registerDomEvent(el: Window, type: String, callback: (self: HTMLElement, ev: Any) -> Any)
+    open fun registerDomEvent(el: Document, type: String, callback: (self: HTMLElement, ev: Any) -> Any)
+    open fun <K : Nothing?> registerDomEvent(el: HTMLElement, type: K, callback: (self: HTMLElement, ev: Any) -> Any)
+    open fun registerScopeEvent(keyHandler: KeymapEventHandler)
+    open fun registerInterval(id: Number)
 }
 
 open external class Plugin(app: App, manifest: PluginManifest) : Component {
