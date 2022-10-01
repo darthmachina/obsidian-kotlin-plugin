@@ -33,7 +33,7 @@ open external class Plugin(app: App, manifest: PluginManifest) : Component {
     open fun addStatusBarItem(): HTMLElement
     open fun addCommand(command: Command): Command
     open fun addSettingTab(settingTab: PluginSettingTab)
-//    open fun registerView(type: String, viewCreator: ViewCreator)
+    open fun registerView(type: String, viewCreator: (leaf: WorkspaceLeaf) -> View)
     open fun registerExtensions(extensions: Array<String>, viewType: String)
     open fun registerMarkdownPostProcessor(postProcessor: MarkdownPostProcessor): MarkdownPostProcessor
     open fun registerMarkdownCodeBlockProcessor(language: String, handler: (source: String, el: HTMLElement, ctx: MarkdownPostProcessorContext) -> Any): MarkdownPostProcessor
@@ -248,6 +248,8 @@ external interface DataAdapter {
     fun copy(normalizedPath: String, normalizedNewPath: String): Promise<Unit>
 }
 
+external class Notice(message: String, timeout: Int? = definedExternally)
+
 external interface Stat {
     var type: String /* "file" | "folder" */
     var ctime: Number
@@ -347,6 +349,11 @@ external interface ListItemCache : CacheItem {
     var task: String?
         get() = definedExternally
         set(value) = definedExternally
+
+    /**
+     * The line number of the parent list item for a nested list.
+     * - negative means there is no parent
+     */
     var parent: Number
 }
 
@@ -382,7 +389,7 @@ open external class WorkspaceLeaf : WorkspaceItem {
     open fun getViewState(): ViewState
     open fun setViewState(viewState: ViewState, eState: Any = definedExternally): Promise<Unit>
     open fun getEphemeralState(): Any
-    open fun setEphemeralState(state: Any)
+    open fun setEphemeralState(state: dynamic)
     open fun togglePinned()
     open fun setPinned(pinned: Boolean)
     open fun setGroupMember(other: WorkspaceLeaf)
@@ -396,8 +403,6 @@ open external class WorkspaceLeaf : WorkspaceItem {
     open fun on(name: String /* "group-change" */, callback: (group: String) -> Any, ctx: Any = definedExternally): EventRef
     open fun on(name: String /* "group-change" */, callback: (group: String) -> Any): EventRef
 }
-
-//typealias ViewCreator = (leaf: WorkspaceLeaf) -> View
 
 open external class View(leaf: WorkspaceLeaf) : Component {
     open var app: App
