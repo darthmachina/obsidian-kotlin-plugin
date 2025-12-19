@@ -47,6 +47,7 @@ open external class Plugin(app: App, manifest: PluginManifest) : Component {
 open external class PluginSettingTab(app: App, plugin: Plugin) : SettingTab
 
 open external class SettingTab {
+    open var icon: String
     open var app: App
     open var containerEl: HTMLElement
     open fun display(): Any

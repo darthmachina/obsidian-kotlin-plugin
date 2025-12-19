@@ -1,4 +1,3 @@
-import kotlinx.dom.clear
 import kotlinx.html.dom.append
 import kotlinx.html.js.h2
 import org.w3c.dom.HTMLElement

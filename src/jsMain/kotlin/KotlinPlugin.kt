@@ -32,7 +32,7 @@ class KotlinPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
         // TODO Figure out how to use getActiveViewOfType
 
         // Add Settings tab
-        addSettingTab(KotlinPluginSettingsTab(app, this))
+//        addSettingTab(KotlinPluginSettingsTab(app, this))
         console.log("KotlinPlugin onload()")
     }
 
@@ -41,14 +41,18 @@ class KotlinPlugin(app: App, manifest: PluginManifest) : Plugin(app, manifest) {
     }
 
     private fun loadSettings() {
-        // TODO: implement exmaple of versioned settings
-        loadData().then {result ->
-            val loadedSettings = KotlinPluginSettings.fromJson(result as String)
-            console.log("loadedSettings: ", loadedSettings)
-            // TODO Replace with a version check
-            if (loadedSettings.mySetting != "") {
-                console.log("Saving loaded settings")
-                settings = loadedSettings
+        console.log("KotlinPlugin.loadSettings()")
+        // TODO: implement example of versioned settings
+        loadData().then { result ->
+            console.log(" - loadData result: $result")
+            if (result != null) {
+                val loadedSettings = KotlinPluginSettings.fromJson(result as String)
+                console.log("loadedSettings: ", loadedSettings)
+                // TODO Replace with a version check
+                if (loadedSettings.mySetting != "") {
+                    console.log("Saving loaded settings")
+                    settings = loadedSettings
+                }
             }
         }
     }
